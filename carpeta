@@ -1,0 +1,12 @@
+juba-studios/
+├── index.html
+├── assets/
+│   ├── edicion/
+│   │   ├── mr-watches.jpg
+│   │   ├── editor-inc-01.jpg
+│   │   └── editor-inc-02.jpg
+│   └── modelado/
+│       ├── model-01.jpg
+│       ├── model-02.jpg
+│       ├── model-03.jpg
+│       └── model-04.jpg
