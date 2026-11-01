@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JUBA STUDIOS // Digital Engineering & Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #121216;
+      --surface-border: #27272a;
+      --text: #f4f4f5;
+      --muted: #71717a;
+      --accent: #22c55e;
+      --accent-dim: rgba(34, 197, 94, 0.1);
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      line-height: 1.5;
+      padding: 0 1.5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-image: linear-gradient(var(--surface-border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--surface-border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 2rem 0 5rem;
+    }
+
+    .page-section { display: none; padding: 2rem 0; }
+    .page-section.active { display: block; animation: glitchIn 0.2s steps(2); }
+
+    @keyframes glitchIn {
+      0% { opacity: 0; transform: translateY(4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 0; max-width: 1040px; margin: 0 auto;
+      border-bottom: 2px solid var(--surface-border);
+      background-color: var(--bg);
+      position: sticky; top: 0; z-index: 20;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span {
+      background: var(--accent);
+      color: #000;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .menu-toggle {
+      background: none; border: 1px solid var(--surface-border);
+      color: var(--text); padding: 0.5rem 0.8rem; cursor: pointer;
+      font-family: var(--font-mono); font-size: 0.85rem;
+      text-transform: uppercase; transition: all 0.1s;
+    }
+
+    .menu-toggle:hover { background: var(--surface-border); }
+
+    .nav-menu {
+      position: fixed; top: 0; right: -100%; width: 340px; height: 100vh;
+      background-color: var(--surface); border-left: 2px solid var(--surface-border);
+      padding: 5rem 2rem 2rem; display: flex; flex-direction: column; gap: 0.5rem;
+      transition: right 0.2s cubic-bezier(0,0,0.2,1); z-index: 25;
+    }
+
+    .nav-menu.open { right: 0; }
+    .nav-menu button {
+      background: transparent; border: 1px solid transparent;
+      color: var(--muted); text-align: left; padding: 0.8rem 1rem;
+      font-family: var(--font-mono); font-size: 0.95rem; cursor: pointer;
+      transition: all 0.1s; text-transform: uppercase;
+    }
+    .nav-menu button:hover { color: var(--text); border-color: var(--surface-border); }
+    .nav-menu button.active {
+      color: var(--accent); border-color: var(--accent);
+      background-color: var(--accent-dim);
+    }
+    .nav-menu .back-btn {
+      margin-top: auto; border: 1px solid var(--surface-border) !important;
+      color: var(--text) !important; text-align: center;
+    }
+
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 15; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .overlay.active { opacity: 1; pointer-events: auto; }
+
+    .hero { padding: 4rem 0 2rem; }
+    .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 0.95; margin-bottom: 1.5rem; color: #fff; }
+    .hero p { color: var(--muted); font-size: 1.05rem; max-width: 600px; margin-bottom: 2rem; }
+
+    .system-status {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      border: 1px solid var(--surface-border); padding: 0.4rem 0.8rem;
+      font-size: 0.8rem; margin-bottom: 2rem; background: var(--surface);
+    }
+    .status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
+
+    .hero-links {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .hero-link-card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      padding: 1.5rem; cursor: pointer; transition: border-color 0.1s;
+    }
+    .hero-link-card:hover { border-color: var(--accent); }
+    .hero-link-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #fff; }
+    .hero-link-card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+    .hero-link-card span { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; }
+
+    h2 { font-size: 1.5rem; margin: 3rem 0 1.5rem; color: #fff; border-left: 3px solid var(--accent); padding-left: 0.8rem; }
+
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem; margin: 1.5rem 0;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      padding: 1.5rem; display: flex; flex-direction: column;
+    }
+    .card h3 { font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem; }
+    .price {
+      font-size: 1.75rem; font-family: var(--font-display); font-weight: 800;
+      color: var(--accent); margin: 0.5rem 0 1rem;
+    }
+    .price small { font-size: 0.75rem; font-family: var(--font-mono); color: var(--muted); }
+
+    .card ul { list-style: none; margin-top: 0.5rem; }
+    .card ul li { font-size: 0.85rem; color: var(--muted); padding: 0.4rem 0; border-bottom: 1px dashed var(--surface-border); }
+    .card ul li strong { color: var(--text); }
+    .card ul li:last-child { border-bottom: none; }
+
+    .card.custom-plan { border-color: var(--accent); background: #0e1610; }
+
+    .service-list {
+      list-style: none; background: var(--surface); border: 1px solid var(--surface-border);
+      margin: 1.5rem 0;
+    }
+    .service-list li {
+      display: flex; justify-content: space-between; padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--surface-border); font-size: 0.9rem;
+    }
+    .service-list li:last-child { border-bottom: none; }
+    .service-list li span:last-child { color: var(--accent); font-weight: 600; }
+
+    .note { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+
+    .method-list { list-style: none; margin: 1rem 0; }
+    .method-list li { padding: 0.5rem 0 0.5rem 1.2rem; position: relative; font-size: 0.9rem; color: var(--muted); border-bottom: 1px solid var(--surface-border); }
+    .method-list li::before { content: ">"; position: absolute; left: 0; color: var(--accent); }
+
+    .samples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin: 1.5rem 0;
+    }
+
+    .sample-card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      overflow: hidden; transition: transform 0.2s ease;
+    }
+    .sample-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+
+    .sample-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      background: #1a1a1a;
+    }
+
+    .sample-body {
+      padding: 1rem;
+    }
+
+    .sample-body h3 {
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .sample-body p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .sample-url {
+      display: inline-block;
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: var(--accent);
+      padding: 0.55rem 0.8rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .sample-url:hover {
+      text-decoration: none;
+      background: rgba(34,197,94,0.12);
+    }
+
+    .contact-box {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      padding: 2.5rem 1.5rem; text-align: center; margin: 3rem 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--surface-border); padding: 2rem 0;
+      text-align: center; font-size: 0.75rem; color: var(--muted); margin-top: 4rem;
+    }
+
+    @media(max-width: 600px) {
+      .nav-menu { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="overlay"></div>
+
+  <header>
+    <div class="logo">JUBA <span>// STUDIOS</span></div>
+    <button class="menu-toggle" id="menuToggle">[ MENÚ ]</button>
+  </header>
+
+  <nav class="nav-menu" id="navMenu">
+    <button data-section="intro" class="active">// 00. Inicio</button>
+    <button data-section="edicion">// 01. Edición y Diseño</button>
+    <button data-section="programacion">// 02. Programación Web</button>
+    <button data-section="modelado">// 03. Modelado 3D</button>
+    <button class="back-btn" onclick="showSection('intro')">← Volver al inicio</button>
+  </nav>
+
+  <main class="container">
+
+    <section class="page-section active" id="intro">
+      <div class="hero">
+        <div class="system-status">
+          <div class="status-dot"></div>
+          <span>ESTADO: DISPONIBLE PARA NUEVOS PROYECTOS (PAGO ÚNICO EN USDT)</span>
+        </div>
+        <h1>Ingeniería digital y contenidos.</h1>
+        <p>Desarrollo web frontend, edición de video de alto impacto y modelado 3D estructurado bajo requerimientos estrictos.</p>
+
+        <div class="contact-box" style="margin-top: 1rem; margin-bottom: 3rem;">
+          <h3>¿Iniciar un proyecto?</h3>
+          <p style="font-size: 0.9rem; color: var(--muted); margin-top: 0.8rem;">
+            Escribir por privado a este usuario de Reddit: <strong style="color: var(--accent);">LegitimateMistake715</strong>
+          </p>
+        </div>
+
+        <div class="hero-links">
+          <div class="hero-link-card" onclick="showSection('edicion')">
+            <h3>Edición y diseño</h3>
+            <p>Reels, shorts, piezas gráficas y packs de producción mensual.</p>
+            <span>Ver specs →</span>
+          </div>
+          <div class="hero-link-card" onclick="showSection('programacion')">
+            <h3>Programación web</h3>
+            <p>Sitios dinámicos estructurados en HTML, CSS y JavaScript.</p>
+            <span>Ver specs →</span>
+          </div>
+          <div class="hero-link-card" onclick="showSection('modelado')">
+            <h3>Modelado 3D</h3>
+            <p>Assets y mallas optimizadas para motores y entornos virtuales.</p>
+            <span>Ver specs →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section" id="edicion">
+      <h1>Edición & Multimedia</h1>
+      <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Cortes limpios, diseño vectorial y piezas para plataformas de alta retención.</p>
+
+      <h2>Servicios unitarios</h2>
+      <ul class="service-list">
+        <li><span>Post estático / redes</span> <span>desde 5 USDT</span></li>
+        <li><span>Logo y branding ID</span> <span>desde 15 USDT</span></li>
+        <li><span>Diseño gráfico genérico</span> <span>desde 10 USDT</span></li>
+        <li><span>Reel vertical (Instagram)</span> <span>desde 10 USDT</span></li>
+        <li><span>Short vertical (TikTok / YT)</span> <span>desde 12 USDT</span></li>
+        <li><span>Edición de video (hasta 3 min)</span> <span>desde 7 USDT</span></li>
+        <li><span>Edición de video largo (hasta 15 min)</span> <span>desde 30 USDT</span></li>
+      </ul>
+      <p class="note">* El costo final varía según la carga de efectos visuales y requerimientos de subtitulado.</p>
+
+      <h2>Packs de producción mensual</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Starter</h3>
+          <div class="price">15 <small>USDT/m</small></div>
+          <ul>
+            <li><strong>16 piezas/mes</strong> (4 por semana)</li>
+            <li>Cortes y transiciones base</li>
+            <li>Subtítulos simples y audio mix</li>
+            <li>1 revisión por entrega</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Creator</h3>
+          <div class="price">35 <small>USDT/m</small></div>
+          <ul>
+            <li><strong>32 piezas/mes</strong> (8 por semana)</li>
+            <li>Subtítulos dinámicos custom</li>
+            <li>Sound design & efectos</li>
+            <li>1 revisión por entrega</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Pro</h3>
+          <div class="price">60 <small>USDT/m</small></div>
+          <ul>
+            <li><strong>48 piezas/mes</strong> (12 por semana)</li>
+            <li>Edición avanzada / narrativa</li>
+            <li>Motion graphics y branding</li>
+            <li>2 revisiones por entrega</li>
+          </ul>
+        </div>
+        <div class="card custom-plan">
+          <h3>Custom</h3>
+          <div class="price" style="font-size: 1.25rem;">A Medida</div>
+          <ul>
+            <li>Evaluación técnica previa</li>
+            <li>Adaptación multiplataforma</li>
+            <li>Frecuencia de entrega flexible</li>
+            <li>Uso de material propio o stock</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Muestras de diseño</h2>
+      <div class="samples-grid">
+        <div class="sample-card">
+          <img src="assets/edicion/mr-watches.jpg" alt="Mr. Watches">
+          <div class="sample-body">
+            <h3>Mr. Watches</h3>
+            <p>Identidad visual</p>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="assets/edicion/editor-inc-01.jpg" alt="Editor Inc. collage">
+          <div class="sample-body">
+            <h3>Editor, Inc.</h3>
+            <p>Branding / creatividad editorial</p>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="assets/edicion/editor-inc-02.jpg" alt="Editor Inc. collage 2">
+          <div class="sample-body">
+            <h3>Editor, Inc.</h3>
+            <p>Concepto visual / composición</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Muestras de video</h2>
+      <div class="samples-grid">
+        <div class="sample-card">
+          <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=900&q=80" alt="Reel publicitario">
+          <div class="sample-body">
+            <h3>Reel Publicitario</h3>
+            <p>Edición comercial de alto ritmo</p>
+            <a href="https://canva.link/9orx66qpm7wu654" target="_blank" class="sample-url">Ver video en Canva →</a>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80" alt="Showreel">
+          <div class="sample-body">
+            <h3>Showreel Tiempos</h3>
+            <p>Pruebas de efectos y cortes</p>
+            <a href="https://canva.link/8zlxv4k30lwtmjf" target="_blank" class="sample-url">Ver video en Canva →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section" id="programacion">
+      <h1>Programación Frontend</h1>
+      <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Desarrollo puro con HTML, CSS y JavaScript estructurado.</p>
+
+      <div class="card" style="max-width: 380px; margin-bottom: 1.5rem;">
+        <h3>Desarrollo Web Base</h3>
+        <div class="price">5 <small>USDT</small></div>
+        <p style="font-size: 0.85rem; color: var(--muted);">Presupuesto base sujeto a complejidad del layout y lógica JS requerida.</p>
+        <p class="note">* No incluye costos de dominio o alojamiento web.</p>
+      </div>
+
+      <div class="card" style="border-left: 2px solid var(--accent); margin-bottom: 2rem;">
+        <h3 style="font-size: 0.95rem; margin-bottom: 0.3rem;">Protocolo de entrega</h3>
+        <p style="font-size: 0.85rem; color: var(--muted);">Se entrega el código fuente empaquetado (HTML/CSS/JS). La puesta en producción, servidores y DNS corren exclusivamente por cuenta del cliente.</p>
+      </div>
+
+      <h2>Muestras de código (CodePen)</h2>
+      <div class="samples-grid">
+        <div class="sample-card">
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80" alt="Muestra UI 01">
+          <div class="sample-body">
+            <h3>Muestra UI 01</h3>
+            <p>Estructura frontend</p>
+            <a href="https://codepen.io/editor/Juan-Pepe-the-scripter/pen/01a19294-aca6-7ad1-95bf-4b580a55688e" target="_blank" class="sample-url">Ver código en CodePen →</a>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="Muestra UI 02">
+          <div class="sample-body">
+            <h3>Muestra UI 02</h3>
+            <p>Componentes y lógica</p>
+            <a href="https://codepen.io/editor/Juan-Pepe-the-scripter/pen/01a1929c-e2b8-717b-9d02-68a217481964" target="_blank" class="sample-url">Ver código en CodePen →</a>
+          </div>
+        </div>
+      </div>
+
+      <h2>Condiciones operativas</h2>
+      <ul class="method-list">
+        <li>Validación técnica previa a la aceptación de cualquier encargo.</li>
+        <li>Acuerdo de plazos y características inalterables post-inicio.</li>
+        <li>Soporte de comunicación transparente durante todo el ciclo.</li>
+      </ul>
+    </section>
+
+    <section class="page-section" id="modelado">
+      <h1>Modelado 3D</h1>
+      <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Construcción de assets tridimensionales y mallas optimizadas.</p>
+
+      <div class="card" style="max-width: 380px; margin-bottom: 2rem;">
+        <h3>Asset 3D Custom</h3>
+        <div class="price">20 – 100 <small>USDT</small></div>
+        <p style="font-size: 0.85rem; color: var(--muted);">Tasación basada en densidad poligonal, texturizado, rigging y motor de destino.</p>
+      </div>
+
+      <h2>Muestras de assets</h2>
+      <div class="samples-grid">
+        <div class="sample-card">
+          <img src="assets/modelado/model-01.jpg" alt="Asset model 01">
+          <div class="sample-body">
+            <h3>Asset Model 01</h3>
+            <p>Malla y texturas</p>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="assets/modelado/model-02.jpg" alt="Asset model 02">
+          <div class="sample-body">
+            <h3>Asset Model 02</h3>
+            <p>Malla y texturas</p>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="assets/modelado/model-03.jpg" alt="Asset model 03">
+          <div class="sample-body">
+            <h3>Asset Model 03</h3>
+            <p>Malla y texturas</p>
+          </div>
+        </div>
+
+        <div class="sample-card">
+          <img src="assets/modelado/model-04.jpg" alt="Asset model 04">
+          <div class="sample-body">
+            <h3>Asset Model 04</h3>
+            <p>Malla y texturas</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>JUBA STUDIOS // INDEPENDENT DIGITAL SERVICES — 2026</p>
+    <p style="margin-top: 0.3rem;">TRANSACCIONES EXCLUSIVAS EN USDT</p>
+  </footer>
+
+  <script>
+    (function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const navMenu = document.getElementById('navMenu');
+      const overlay = document.getElementById('overlay');
+      const navButtons = navMenu.querySelectorAll('button[data-section]');
+      const sections = document.querySelectorAll('.page-section');
+
+      function openMenu() {
+        navMenu.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMenu() {
+        navMenu.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      menuToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        navMenu.classList.contains('open') ? closeMenu() : openMenu();
+      });
+
+      overlay.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && navMenu.classList.contains('open')) closeMenu();
+      });
+
+      window.showSection = function(id) {
+        sections.forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+
+        navButtons.forEach(b => {
+          if(b.dataset.section) {
+            b.classList.toggle('active', b.dataset.section === id);
+          }
+        });
+
+        closeMenu();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          if(this.dataset.section) {
+            showSection(this.dataset.section);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
